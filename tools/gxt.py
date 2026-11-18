@@ -1,4 +1,4 @@
-"""PS Vita GXT (UBC3/DXT5 swizzled, U8 swizzled) 디코드/인코드"""
+"""PS Vita GXT (UBC2/DXT3 swizzled, U8 swizzled) 디코드/인코드"""
 import struct,numpy as np
 def morton_idx(w,h,yfirst=True):
     """swizzle index map for w x h (in units) -> linear index list. Vita: morton within min-square, tiles along longer axis"""
@@ -50,13 +50,29 @@ def dxt5_blocks_decode(data,nb):
         out[:,p,:3]=pal[np.arange(nb),ci]
         out[:,p,3]=al[np.arange(nb),ai]
     return out
+def dxt3_blocks_decode(data,nb):
+    """UBC2(0x86) = DXT3: 4비트 명시 알파 + DXT1 색 블록"""
+    a=np.frombuffer(data,dtype=np.uint8)[:nb*16].reshape(nb,16)
+    out=dxt5_blocks_decode(data,nb)
+    ab=np.zeros(nb,dtype=np.uint64)
+    for i in range(8): ab|=a[:,i].astype(np.uint64)<<np.uint64(8*i)
+    for p in range(16): out[:,p,3]=(((ab>>np.uint64(4*p))&np.uint64(15)).astype(np.uint8))*17
+    return out
+def dxt3_blocks_encode(px):
+    out=np.frombuffer(dxt5_blocks_encode(px),dtype=np.uint8).reshape(-1,16).copy()
+    a=(px[...,3].astype(np.int32)*15+127)//255
+    ab=np.zeros(px.shape[0],dtype=np.uint64)
+    for i in range(16): ab|=a[:,i].astype(np.uint64)<<np.uint64(4*i)
+    for i in range(8): out[:,i]=((ab>>np.uint64(8*i))&np.uint64(255)).astype(np.uint8)
+    return out.tobytes()
+LEGACY_DXT5=False  # True면 예전(잘못된) DXT5 해석 — 변환용
 def decode(b,t):
     w,h=t['w'],t['h']; d=b[t['off']:t['off']+t['size']]
     base=t['fmt']&0xFF000000
     if base==0x86000000:
         bw,bh=(w+3)//4,(h+3)//4
         pw=1<<(bw-1).bit_length(); ph=1<<(bh-1).bit_length()
-        blocks=dxt5_blocks_decode(d,pw*ph)
+        blocks=(dxt5_blocks_decode if LEGACY_DXT5 else dxt3_blocks_decode)(d,pw*ph)
         sw=morton_idx(pw,ph)
         img=np.zeros((ph*4,pw*4,4),dtype=np.uint8)
         bl=blocks[sw.reshape(-1)].reshape(ph,pw,4,4,4)
@@ -113,7 +129,7 @@ def _enc_level(img,w,h,base):
         bl=full.reshape(ph,4,pw,4,4).transpose(0,2,1,3,4).reshape(ph*pw,16,4)
         sw=morton_idx(pw,ph).reshape(-1)
         st=np.zeros_like(bl); st[sw]=bl
-        return dxt5_blocks_encode(st)
+        return dxt3_blocks_encode(st)
     pw=1<<(w-1).bit_length(); ph=1<<(h-1).bit_length()
     full=np.zeros((ph,pw),dtype=np.uint8); full[:h,:w]=img[...,3]
     sw=morton_idx(pw,ph).reshape(-1)

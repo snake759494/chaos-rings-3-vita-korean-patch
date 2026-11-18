@@ -1,6 +1,6 @@
 # 카오스링 III PS Vita 한글패치
 
-PS Vita 일본판 **카오스링 III(ケイオスリングスIII, PCSG00500)**용 비공식 한국어 패치입니다. 스토리 대사, 메뉴·시스템 메시지, 아이템·장비·스킬·진(Gene) 설명, 퀘스트·상점·도감 등 게임 안 일본어 문자열 **24,378개 전체**를 직접 한국어로 옮겼습니다. 게임 글꼴에 한글 **2,354자**를 넣었습니다. 타이틀 로고 아래에는 한글 부제를 넣었습니다. 메뉴·버튼·튜토리얼 화면·배틀/이벤트 배너 등 그림 글자도 한글로 다시 그렸습니다. 현재 배포판은 **v1.0.0 (2026-11-18)**입니다.
+PS Vita 일본판 **카오스링 III(ケイオスリングスIII, PCSG00500)**용 비공식 한국어 패치입니다. 스토리 대사, 메뉴·시스템 메시지, 아이템·장비·스킬·진(Gene) 설명, 퀘스트·상점·도감 등 게임 안 일본어 문자열 **24,378개 전체**를 직접 한국어로 옮겼습니다. 게임 글꼴에 한글 **2,354자**를 넣었습니다. 타이틀 로고 아래에는 한글 부제를 넣었습니다. 메뉴·버튼·튜토리얼 화면·배틀/이벤트 배너 등 그림 글자도 한글로 다시 그렸습니다. 현재 배포판은 **v1.0.1 (2026-11-18)**입니다.
 
 [패치 다운로드](https://github.com/snake759494/chaos-rings-3-vita-korean-patch/releases/latest) · [기술 설명](docs/TECHNICAL.md) · [재빌드](docs/BUILD.md) · [용어집](docs/GLOSSARY.md) · [변경 기록](CHANGELOG.md) · [권리 안내](RIGHTS.md)
 
@@ -56,7 +56,7 @@ xdelta는 호환성을 위해 압축·2차 압축·파일 경로 헤더 없이 �
 ### 명령줄 사용
 
 ```powershell
-.\xdelta3.exe -d -s '.\CRDB.psp2.mvgl' '.\Chaos_Rings_III_Vita_KO_v1.0.0_text.xdelta' '.\ko\CRDB.psp2.mvgl'
+.\xdelta3.exe -d -s '.\CRDB.psp2.mvgl' '.\Chaos_Rings_III_Vita_KO_v1.0.1_text.xdelta' '.\ko\CRDB.psp2.mvgl'
 ```
 
 나머지 6개도 같은 방식입니다. 해시를 자동으로 검사하는 도구도 있습니다. Python 3와 xdelta3가 필요합니다. `--source-dir`에는 원본 `resources` 폴더를, `--patch-dir`에는 xdelta 7개가 있는 폴더를 지정합니다. 결과는 출력 폴더에 같은 구조(`font/` 포함)로 만들어집니다. 같은 이름의 출력 파일이 이미 있으면 덮어쓰지 않습니다.
